@@ -17,49 +17,59 @@ import schemeJson from "./schema.json";
 import packageJson from "./packages.json";
 
 const CodeRender = () => {
-  const [data, setData] = useState({ schema: {}, components: {} });
+  const [data, setData] = useState({
+    schema: undefined,
+    components: undefined,
+  });
 
-  useEffect(() => {
-    const init = async () => {
-      const packages = packageJson;
-      const { componentsMap: componentsMapArray, componentsTree } = schemeJson;
-      const componentsMap = {};
-      componentsMapArray.forEach((component) => {
-        componentsMap[component.componentName] = component;
-      });
-      const schema = componentsTree[0];
+  async function init() {
+    const packages = packageJson;
+    const projectSchema = schemeJson;
 
-      const libraryMap = {};
-      const libraryAsset = [];
-      packages.forEach(({ package: _package, library, urls, renderUrls }) => {
-        libraryMap[_package] = library;
-        if (renderUrls) {
-          libraryAsset.push(renderUrls);
-        } else if (urls) {
-          libraryAsset.push(urls);
-        }
-      });
+    const { componentsMap: componentsMapArray, componentsTree } = projectSchema;
+    const componentsMap = {};
+    componentsMapArray.forEach((component) => {
+      componentsMap[component.componentName] = component;
+    });
 
-      const vendors = [assetBundle(libraryAsset, AssetLevel.Library)];
+    const schema = componentsTree[0];
 
-      const assetLoader = new AssetLoader();
-      await assetLoader.load(libraryAsset);
+    const libraryMap = {};
+    const libraryAsset = [];
+    packages.forEach(({ package: _package, library, urls, renderUrls }) => {
+      libraryMap[_package] = library;
+      if (renderUrls) {
+        libraryAsset.push(renderUrls);
+      } else if (urls) {
+        libraryAsset.push(urls);
+      }
+    });
 
-      // const components = await injectComponents(buildComponents(libraryMap, componentsMap));
+    const vendors = [assetBundle(libraryAsset, AssetLevel.Library)];
 
-      // components 为空对象
-      const components = buildComponents(libraryMap, componentsMap);
+    // TODO asset may cause pollution
+    const assetLoader = new AssetLoader();
+    // await assetLoader.load(libraryAsset);
 
-      setData({ schema, components });
-    };
+    // const components = await injectComponents(buildComponents(libraryMap, componentsMap));
+    const components = buildComponents(libraryMap, componentsMap);
+    console.log("components", components); // {}
 
+    setData({
+      schema,
+      components,
+    });
+  }
+
+  if (!data.schema || !data.components) {
     init();
-  }, []);
+    return <p>loading...</p>;
+  }
 
   return (
     <>
       <h1>CodeRender</h1>
-      <ReactRenderer schema={data.schema} components={data.components} />
+      {/* <ReactRenderer schema={data.schema} components={data.components} /> */}
     </>
   );
 };
