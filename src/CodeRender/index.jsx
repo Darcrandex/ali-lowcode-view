@@ -49,16 +49,23 @@ const CodeRender = () => {
 
     // TODO asset may cause pollution
     const assetLoader = new AssetLoader();
+
+    // 先动态加载依赖包
+    // 会在 head 标签中动态添加 script 和 link 标签
     await assetLoader.load(libraryAsset);
 
     // const components = await injectComponents(buildComponents(libraryMap, componentsMap));
-    const components = buildComponents(libraryMap, componentsMap);
-    console.log("components", components); // {}
 
-    setData({
-      schema,
-      components,
-    });
+    // 这个步骤是把页面中依赖的组件定义成一个 Map
+    // 里面的组件会关联上述动态加载的依赖包中指定的组件
+    // 类似这样：
+    // { Button : window.UILibray.Button }
+    const components = buildComponents(libraryMap, componentsMap);
+    console.log("components", components);
+
+    // 最终的结构参考 LocalRender
+    setData({ schema, components });
+    console.log("schema", schema);
   }
 
   if (!data.schema || !data.components) {
