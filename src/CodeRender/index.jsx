@@ -49,7 +49,7 @@ const CodeRender = () => {
 
     // TODO asset may cause pollution
     const assetLoader = new AssetLoader();
-    // await assetLoader.load(libraryAsset);
+    await assetLoader.load(libraryAsset);
 
     // const components = await injectComponents(buildComponents(libraryMap, componentsMap));
     const components = buildComponents(libraryMap, componentsMap);
@@ -69,7 +69,7 @@ const CodeRender = () => {
   return (
     <>
       <h1>CodeRender</h1>
-      {/* <ReactRenderer schema={data.schema} components={data.components} /> */}
+      <ReactRenderer schema={data.schema} components={data.components} />
     </>
   );
 };
