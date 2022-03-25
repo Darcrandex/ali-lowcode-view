@@ -4,15 +4,11 @@
  * @author darcrand
  */
 
-import React, { useEffect, useState } from "react";
-import {
-  buildComponents,
-  assetBundle,
-  AssetLoader,
-  AssetLevel,
-} from "@alilc/lowcode-utils";
+import React, { useState } from "react";
+import { buildComponents, AssetLoader } from "@alilc/lowcode-utils";
 import ReactRenderer from "@alilc/lowcode-react-renderer";
 
+// 这两个数据就是 demo 中点击保存后，缓存在 localStorage 中的数据
 import schemeJson from "./schema.json";
 import packageJson from "./packages.json";
 
@@ -32,8 +28,6 @@ const CodeRender = () => {
       componentsMap[component.componentName] = component;
     });
 
-    const schema = componentsTree[0];
-
     const libraryMap = {};
     const libraryAsset = [];
     packages.forEach(({ package: _package, library, urls, renderUrls }) => {
@@ -45,7 +39,7 @@ const CodeRender = () => {
       }
     });
 
-    const vendors = [assetBundle(libraryAsset, AssetLevel.Library)];
+    // const vendors = [assetBundle(libraryAsset, AssetLevel.Library)];
 
     // TODO asset may cause pollution
     const assetLoader = new AssetLoader();
@@ -61,11 +55,14 @@ const CodeRender = () => {
     // 类似这样：
     // { Button : window.UILibray.Button }
     const components = buildComponents(libraryMap, componentsMap);
-    console.log("components", components);
+
+    const schema = componentsTree[0];
 
     // 最终的结构参考 LocalRender
     setData({ schema, components });
+
     console.log("schema", schema);
+    console.log("components", components);
   }
 
   if (!data.schema || !data.components) {
